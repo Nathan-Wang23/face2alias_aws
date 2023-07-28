@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/images/{imageId}": {
+      "name": "/images/{imageId}",
+      "lambdaFunction": "face2alias",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}
