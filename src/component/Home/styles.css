@@ -9,19 +9,22 @@ body {
     width: auto;
     padding: 10px;
   } */
+
+  .crls {
+    width: 'auto';
+    height: 'auto';
+    margin-top: '5%'
+  }
   
-  .div1 {
-    margin-top: 2%;
-    width: auto;
-    padding: 10px;
+  /* .div1 {
+    margin-top: auto;
   }
   .div2 {
-    margin: auto
-  } 
+    margin: auto;
+    width:'auto'
+  }  */
 
   .submitButton {
     margin-top: 2%;
-    margin-bottom:1%
+    margin-bottom:3%
   }
-
-  /* ask Nathan to help */
