@@ -11,6 +11,7 @@ const ImageBox = ({ image_base64, boxesCoordinates, width, height, color, aliase
 
     const image = new Image();
     image.src = `${image_base64}`;
+
     image.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height); // make sure is clean 
       ctx.drawImage(image, 0, 0, width, height);
@@ -21,19 +22,22 @@ const ImageBox = ({ image_base64, boxesCoordinates, width, height, color, aliase
         // const {boxesCoordinates, aliasesImg} = boxWithName;// adding the alias 
 
         ctx.strokeStyle = color[i];
+        ctx.font = "16px Arial"; // set to aws font
         ctx.lineWidth = 2;
         ctx.strokeRect(boxesCoordinates[i].x, boxesCoordinates[i].y, boxesCoordinates[i].width, boxesCoordinates[i].height); // draw the box
       
-        ctx.fillStyle = "#ffffff";
-        const textWidth = ctx.measureText(aliases[i]).width;
-        ctx.fillRect(boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2, boxesCoordinates[i].y - 20, textWidth + 4, 20);
-        console.log(aliases[i], boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2)
 
-        ctx.font = "16px Arial"; // set to aws font
-        ctx.fillStyle = color[i]; 
-        ctx.fillStyle = "#000000";
-        ctx.fillText(aliases[i], boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2, boxesCoordinates[i].y -5);
-    }
+        if (aliases[i] != "na") {
+          ctx.fillStyle = "#ffffff";
+          const textWidth = ctx.measureText(aliases[i]).width;
+          ctx.fillRect(boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2, boxesCoordinates[i].y - 20, textWidth + 4, 20);
+          console.log(aliases[i], boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2)
+
+          ctx.fillStyle = color[i]; 
+          ctx.fillStyle = "#000000";
+          ctx.fillText(aliases[i], boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2, boxesCoordinates[i].y -5);
+      }
+      }
     };
   }, [image_base64, boxesCoordinates]);
 

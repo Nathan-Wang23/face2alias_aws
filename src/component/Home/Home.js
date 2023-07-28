@@ -16,15 +16,17 @@ const containerStyle = {
   height: '100vh',
 }
 
-
 const uploadBoxStyle = {
-  width: '300px',
-  height: '200px',
+  width: '400px',
+  height: '300px',
   border: '2px dashed #ddd',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
+  margin: 'auto',
+  padding: '5%',
+  textAlign: 'center'
 };
 
 function Home() { 
@@ -96,6 +98,12 @@ function Home() {
       function(da) { 
         let wid = da[0];
         let hei = da[1];
+
+        if (hei / window.screen.height > 0.7) {
+          hei *= 0.5;
+          wid *= 0.5;
+        }
+
         let boxes = new Array();        
         let aliases_list = data['aliases'];
         let boxes_list = data['boxes'];
@@ -106,7 +114,7 @@ function Home() {
         for (let i = 0; i < num_detected; i++) {
           if (aliases_list[i] == "") {
             cols.push("#FF0000");
-            aliases_list[i] = " Not Amazonian ";
+            aliases_list[i] = "na";
           } else {
             cols.push("#39FF14");
             let temp = aliases_list[i];
@@ -129,7 +137,7 @@ function Home() {
   }
   
   const SubmitButton = () => (
-    <Button id="myButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
+    <Button className="submitButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
   );
   
     return ( 
@@ -201,8 +209,7 @@ function Home() {
                 </div>
                 <div className="div2" style={uploadBoxStyle}>
                   <FormField
-                    label="Form field label"
-                    description="Description"
+                  label="Upload your image"
                   >
                     <FileUpload
                       onChange={({ detail }) => setValue(detail.value)}
@@ -224,9 +231,8 @@ function Home() {
                       showFileSize
                       showFileThumbnail
                       tokenLimit={1}
-                      constraintText="Upload photo"
                     />
-                  </FormField>
+                  </FormField> 
                   <SubmitButton />
                   
                 </div>

@@ -4,17 +4,24 @@ body {
         height:auto; 
         width:auto;
   }
-  .center {
+  /* .center {
     margin: auto;
-    width: 50%;
+    width: auto;
     padding: 10px;
-  }
+  } */
   
   .div1 {
-    margin-top: 20px;
+    margin-top: 2%;
+    width: auto;
+    padding: 10px;
   }
   .div2 {
-    margin-bottom: 20px;
+    margin: auto
   } 
+
+  .submitButton {
+    margin-top: 2%;
+    margin-bottom:1%
+  }
 
   /* ask Nathan to help */
