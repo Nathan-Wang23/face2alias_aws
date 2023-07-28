@@ -31,7 +31,6 @@ const ImageBox = ({ image_base64, boxesCoordinates, width, height, color, aliase
           ctx.fillStyle = "#ffffff";
           const textWidth = ctx.measureText(aliases[i]).width;
           ctx.fillRect(boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2, boxesCoordinates[i].y - 20, textWidth + 4, 20);
-          console.log(aliases[i], boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2)
 
           ctx.fillStyle = color[i]; 
           ctx.fillStyle = "#000000";

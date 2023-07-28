@@ -7,6 +7,8 @@ import Button from "@cloudscape-design/components/button";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
 import ImageBox from "./ImageBox"
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
 
 <link rel="stylesheet" href="styles.css"></link>
 const containerStyle = {
@@ -16,30 +18,33 @@ const containerStyle = {
   height: '100vh',
 }
 
+const navBar = {
+  position: 'sticky'
+}
+
 const uploadBoxStyle = {
   width: '400px',
-  height: '300px',
+  height: '200px',
   border: '2px dashed #ddd',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
   margin: 'auto',
-  padding: '5%',
+  padding: 'auto',
   textAlign: 'center'
 };
 
 function Home() { 
   const [value, setValue] = React.useState([]);
-  const [imgs,setImgs] = React.useState()
-  const[imag, setImag] = React.useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = React.useState(false);
-  const [boxes, setBoxes] = React.useState([]);
-  const [widthImg, setWidthImg] = React.useState();
-  const [heightImg, setHeightImg] = React.useState();
-  const [colors, setColors] = React.useState([]);
-  const [aliasesImg, setAliasesImg] = React.useState([]);
-
+  const [previousUploads, setPreviousUploads] =React.useState([]);
+  const [boxesOfBoxes, setBB] = React.useState([]);
+  const [widths, setWidths] = React.useState([]);
+  const [heights, setHeights] = React.useState([]);
+  const [colorsAll, setColorsAll] = React.useState([]);
+  const [aliasesAll, setAliasesAll] = React.useState([]);
+  const [latest, setLatest] = React.useState(-1);
 
   function face2aliasSubmit() {
     if (value == null || value.length == 0) {
@@ -63,7 +68,6 @@ function Home() {
           });
           const data = await res.json();          
           bound_boxes(image_base64, data);
-          setImag(image_base64);
           setIsButtonDisabled(false);
           setValue([]);
         } catch (error) {
@@ -99,14 +103,19 @@ function Home() {
         let wid = da[0];
         let hei = da[1];
 
-        if (hei / window.screen.height > 0.7) {
-          hei *= 0.5;
-          wid *= 0.5;
-        }
+        let ratio = 400 / hei;
+        hei *= ratio;
+        wid *= ratio;
+
 
         let boxes = new Array();        
         let aliases_list = data['aliases'];
         let boxes_list = data['boxes'];
+        
+        if (aliases_list == undefined) {
+          return;
+        }
+
         let num_detected = aliases_list.length;
         let cols = new Array();
         console.log(aliases_list)
@@ -123,12 +132,27 @@ function Home() {
           // how to get the name 
           boxes.push({x: boxes_list[i]['Left'] * wid, y: boxes_list[i]['Top'] * hei, width: boxes_list[i]['Width'] * wid, height: boxes_list[i]['Height'] * hei})
         }
-        console.log(boxes);
-        setBoxes(boxes);
-        setHeightImg(hei);
-        setWidthImg(wid);
-        setColors(cols);
-        setAliasesImg(aliases_list);
+        let temp1 = boxesOfBoxes;
+        temp1.push(boxes);
+        setBB(temp1);
+        let temp2 = widths;
+        temp2.push(wid);
+        setWidths(temp2);
+        let temp3 = heights;
+        temp3.push(hei);
+        setHeights(temp3);
+        let temp4 = colorsAll;
+        temp4.push(cols);
+        setColorsAll(temp4);
+        let temp5 = aliasesAll;
+        temp5.push(aliases_list);
+        setAliasesAll(temp5);
+        let temp6 = previousUploads;
+        temp6.push(image);
+        setPreviousUploads(temp6);
+        let last = latest;
+        last += 1;
+        setLatest(last);
       },
       function(error) {
         console.log(error);
@@ -142,6 +166,7 @@ function Home() {
   
     return ( 
             <div> 
+              <div style={navBar}>
               {/* TopNavigation */}
               <TopNavigation
               identity={{
@@ -200,13 +225,20 @@ function Home() {
                 }
               ]}
               />
+              </div>
 
               {/* FileUpload */}
               <div  style={containerStyle}>
                 <div className="center" >
-                <div className="div1">
-                  <ImageBox image_base64={imag} boxesCoordinates={boxes} width={widthImg} height={heightImg} color={colors} aliases={aliasesImg}/>
-                </div>
+                {previousUploads.length > 0 && (
+                      <Carousel className='crls' showThumbs={false} emulateTouch selectedItem={latest} autoFocus>
+                        {previousUploads.map((upload, index) => (
+                          <div key={index}>
+                            <ImageBox image_base64={upload} boxesCoordinates={boxesOfBoxes[index]} width={widths[index]} height={heights[index]} color={colorsAll[index]} aliases={aliasesAll[index]}/>
+                          </div>
+                        ))}
+                    </Carousel>)}
+
                 <div className="div2" style={uploadBoxStyle}>
                   <FormField
                   label="Upload your image"
