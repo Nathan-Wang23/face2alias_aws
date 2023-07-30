@@ -12,7 +12,7 @@ const containerStyle = {
     alignItems: 'center',
     height: '100vh',
   };
-  
+
   const uploadBoxStyle = {
     width: '300px',
     height: '200px',
@@ -22,75 +22,12 @@ const containerStyle = {
     alignItems: 'center',
     flexDirection: 'column',
   };
-  
+
   function Login() {
     return(
-        <div>
-              {/* TopNavigationComponent */}
-              <TopNavigation
-              identity={{
-                href: "#",
-                title: "Face2Alias",
-              }}
-              utilities={[
-                {
-                  type: "menu-dropdown",
-                  iconName: "settings",
-                  ariaLabel: "Settings",
-                  title: "Settings",
-                  items: [
-                    {
-                      id: "settings-org",
-                      text: "Organizational settings"
-                    },
-                    {
-                      id: "settings-project",
-                      text: "Project settings"
-                    }
-                  ]
-                },
-                {
-                  type: "menu-dropdown",
-                  text: "#Alias",
-                  description: "email@example.com",
-                  iconName: "user-profile",
-                  items: [
-                    { id: "profile", text: "Profile" },
-                    { id: "preferences", text: "Preferences" },
-                    { id: "security", text: "Security" },
-                    {
-                      id: "support-group",
-                      text: "Support",
-                      items: [
-                        {
-                          id: "documentation",
-                          text: "Documentation",
-                          href: "#",
-                          external: true,
-                          externalIconAriaLabel:
-                            " (opens in new tab)"
-                        },
-                        { id: "support", text: "Support" },
-                        {
-                          id: "feedback",
-                          text: "Feedback",
-                          href: "#",
-                          external: true,
-                          externalIconAriaLabel:
-                            " (opens in new tab)"
-                        }
-                      ]
-                    },
-                    { id: "signout", text: "Sign out" }
-                  ]
-                }
-              ]}
-              />
-
-         {/* <div className="login-wrapper"> */}
             <form>
                 <label>
-                <p>Alias</p> 
+                <p>Alias</p>
                 <input type="text" />
                 </label>
                 <label>
@@ -101,9 +38,10 @@ const containerStyle = {
                 <button type="submit">Submit</button>
                 </div>
             </form>
-        </div>    
     )
   }
 
 
-  export default Login; 
+  export default Login;
+
+

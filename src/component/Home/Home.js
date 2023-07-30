@@ -9,6 +9,9 @@ import './styles.css';
 import ImageBox from "./ImageBox"
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
+import Modal from "@cloudscape-design/components/modal";
+import Input from "@cloudscape-design/components/input";
+
 
 <link rel="stylesheet" href="styles.css"></link>
 const containerStyle = {
@@ -35,7 +38,20 @@ const uploadBoxStyle = {
   textAlign: 'center'
 };
 
-function Home() { 
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
+
+
+
+function Home() {
   const [value, setValue] = React.useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = React.useState(false);
   const [previousUploads, setPreviousUploads] =React.useState([]);
@@ -45,7 +61,18 @@ function Home() {
   const [colorsAll, setColorsAll] = React.useState([]);
   const [aliasesAll, setAliasesAll] = React.useState([]);
   const [latest, setLatest] = React.useState(-1);
+  const [isModalOpen, setIsModalOpen] = React.useState(true);
+  const [aliasValue, setAliasValue] = React.useState("");
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+
+  // for testing
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   function face2aliasSubmit() {
     if (value == null || value.length == 0) {
       console.log("Error: no file specified")
@@ -66,18 +93,18 @@ function Home() {
             method: 'POST',
             body: body
           });
-          const data = await res.json();          
+          const data = await res.json();
           bound_boxes(image_base64, data);
           setIsButtonDisabled(false);
           setValue([]);
         } catch (error) {
           console.log("error");
         }
-        
+
       }
 
     }
-    
+
   }
 
 
@@ -88,7 +115,7 @@ function Home() {
       img.onload = () => {
         let w = img.width;
         let h = img.height;
-        
+
         if (w == undefined || h == undefined) {
           reject("ERROR");  // when error
         } else {
@@ -97,9 +124,9 @@ function Home() {
       }
       img.src = image;
     });
-    
+
     getDimensions.then(
-      function(da) { 
+      function(da) {
         let wid = da[0];
         let hei = da[1];
 
@@ -108,10 +135,10 @@ function Home() {
         wid *= ratio;
 
 
-        let boxes = new Array();        
+        let boxes = new Array();
         let aliases_list = data['aliases'];
         let boxes_list = data['boxes'];
-        
+
         if (aliases_list == undefined) {
           return;
         }
@@ -129,7 +156,7 @@ function Home() {
             let temp = aliases_list[i];
             aliases_list[i] = " " + temp + " ";
           }
-          // how to get the name 
+          // how to get the name
           boxes.push({x: boxes_list[i]['Left'] * wid, y: boxes_list[i]['Top'] * hei, width: boxes_list[i]['Width'] * wid, height: boxes_list[i]['Height'] * hei})
         }
         let temp1 = boxesOfBoxes;
@@ -159,13 +186,32 @@ function Home() {
       }
     );
   }
-  
+
   const SubmitButton = () => (
     <Button className="submitButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
   );
-  
-    return ( 
-            <div> 
+
+    return (
+            <div><div>
+            <button onClick={handleOpenModal}>Log In</button>
+            <Modal
+              visible={isModalOpen}
+              onRequestClose={handleCloseModal}
+              contentLabel="Modal"
+            >
+              <FormField label="Alias">
+                <Input
+                  value={aliasValue}
+                  onChange={event =>
+                  setAliasValue(event.detail.value)}
+                />
+                <div>
+                  <Button type="submit">Submit</Button>
+                </div>
+              </FormField>
+              <button onClick={handleCloseModal}>Close</button>
+            </Modal>
+          </div>
               <div style={navBar}>
               {/* TopNavigation */}
               <TopNavigation
@@ -264,15 +310,15 @@ function Home() {
                       showFileThumbnail
                       tokenLimit={1}
                     />
-                  </FormField> 
+                  </FormField>
                   <SubmitButton />
-                  
+
                 </div>
                 </div>
               </div>
             </div>
-     
+
     );
 }
 
-export default Home; 
+export default Home;
