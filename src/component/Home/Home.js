@@ -55,11 +55,11 @@ const modalStyle = {
   content: {
     borderRadius:'20px',
     width:'30%',
-    height:'40%',
+    height:'50%',
     position: 'absolute',
     left: '35%',
     top: '30%',
-    overflow: 'visible'
+    // overflow: 'auto'
   }
 }
 
@@ -110,19 +110,6 @@ const inputBoxStyle = {
   flexDirection: 'column',
 }
 
-// const customStyles = {
-//   content: {
-//     top: '50%',
-//     left: '50%',
-//     right: 'auto',
-//     bottom: 'auto',
-//     marginRight: '-50%',
-//     transform: 'translate(-50%, -50%)',
-//   },
-// };
-
-
-
 function Home() {
   // Photo upload 
   const [value, setValue] = React.useState([]);
@@ -159,7 +146,7 @@ function Home() {
   async function submitLogin() {
     try {
       let alias = aliasValue.toString();
-      let url = "https://jbk08mzwr9.execute-api.us-west-2.amazonaws.com/v1/" // the API 
+      let url = "https://jbk08mzwr9.execute-api.us-west-2.amazonaws.com/v1/" // the API for face2alias_login
       let res = await fetch(url, {
         method: 'POST', // at first we were using ANY in the api, therefore it would give us Missing Authentication Token error, and it took us a while to understand this was the error 
         body: alias
@@ -170,6 +157,7 @@ function Home() {
         setTimeout(() => {
           setSuccess(false);
           setIsModalOpen(false);
+          setIsSign(false);
         }, 2000);
         
       } else {
@@ -301,11 +289,49 @@ function Home() {
     setAliasNew("");
     setPhonetool([]);
     setAliasValue("");
+    setIsModalOpen(!isModalOpen);
     setIsSign(!isSign);
   }
 
-  function handleSignUp() {
-
+  async function handleSignUp() {
+    try {
+      let url = "https://pvhh2t3sgb.execute-api.us-west-2.amazonaws.com/v1/" // the API for face2alias_signup
+      let file = new File(phonetool, "phonetool.jpeg");
+      console.log(file);
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      let alias = aliasNew.toString();
+      reader.onload = async function() {
+        let image_base64 = reader.result;
+        let img = image_base64.substring(37);
+        let body = {
+          "alias": alias,
+          "image": img
+        }
+        let body_json = JSON.stringify(body);
+        let res = await fetch(url, {
+          method: 'POST', 
+          body: body_json
+        });
+        if (res.status === 200) {
+          setSuccessSign(true);
+          setUser(aliasNew);
+          setTimeout(() => {
+            setSuccessSign(false);
+            setIsSign(false);
+          }, 2000);   
+        } else {
+          console.log("ER");
+          setAlertSign(true);
+          setTimeout(() => {
+            setAlertSign(false);
+          }, 5000);
+        }
+        setAliasNew("");
+      }
+    } catch (error) {
+      console.log("error");
+    }
   }
 
   const SubmitButton = () => (
@@ -314,11 +340,12 @@ function Home() {
 
     return (
             <div>
-              {!isSign && (
                 <div>
                 <Modal 
                   style={modalStyle}
-                  isOpen={isModalOpen}>
+                  isOpen={isModalOpen}
+                  ariaHideApp={false}
+                  >
 
                     {alert && (
                       <div style={alertStyle}>
@@ -328,7 +355,7 @@ function Home() {
 
                     {success && (
                       <div style={alertStyle}>
-                        <SuccessBar/>
+                        <SuccessBar header="Successfully logged in" content="Successfully logged in"/>
                     </div>
                     )}
 
@@ -356,24 +383,25 @@ function Home() {
                     </FormField>
                   </Modal>
                 </div>
-              )}
 
               {/* Sign Up */}
-              {isSign && (
+              
                 <div>
                   <Modal 
                   style={signStyle}
-                  isOpen={isSign}>
+                  isOpen={isSign}
+                  ariaHideApp={false}
+                  >
 
-                    {alert && (
+                    {alertSign && (
                       <div style={alertStyle}>
                         <ErrorBar header="Invalid sign up" content="Check your alias or photo upload."/>
                       </div> 
                     )}
 
-                    {success && (
+                    {successSign && (
                       <div style={alertStyle}>
-                        <SuccessBar/>
+                        <SuccessBar header="Successfully signed up" content={`Welcome ${user}`}/>
                     </div>
                     )}
 
@@ -409,7 +437,7 @@ function Home() {
                           showFileLastModified
                           showFileSize
                           showFileThumbnail
-                          tokenLimit={3}
+                          tokenLimit={1}
                           constraintText="Upload jpeg phonetool"
                         />
 
@@ -425,7 +453,7 @@ function Home() {
                     </FormField>
                   </Modal>
                 </div>
-              )}
+              
 
               
               <div style={navBar}>

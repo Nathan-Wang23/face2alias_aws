@@ -1,18 +1,18 @@
 import * as React from "react";
 import Flashbar from "@cloudscape-design/components/flashbar";
 
-const SuccessBar = () => {
+const SuccessBar = ({header, content}) => {
   const [items, setItems] = React.useState([
     {
-      header: "Successfully logged in",
+      header: header,
       type: "success",
-      content: "Your alias is in our system",
+      content: content,
       dismissible: true,
       dismissLabel: "Dismiss message",
       onDismiss: () => setItems([]),
       id: "message_1"
     }
-  ]);
+  ], [header, content]);
   return <Flashbar items={items} />;
 }
 
