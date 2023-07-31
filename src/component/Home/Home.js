@@ -139,7 +139,7 @@ function Home() {
   const [phonetool, setPhonetool] = React.useState([]);
   const [alertSign, setAlertSign] = React.useState(false);
   const [successSign, setSuccessSign] = React.useState(false);
-
+  const [alertMessage, setAlertMessage] = React.useState("");
 
 
 
@@ -313,19 +313,25 @@ function Home() {
           method: 'POST', 
           body: body_json
         });
+        let data = await res.json();
+        console.log(data);
         if (res.status === 200) {
           setSuccessSign(true);
           setUser(aliasNew);
+          setAlertMessage(data);
           setTimeout(() => {
             setSuccessSign(false);
+            setAlertMessage("")
             setIsSign(false);
           }, 2000);   
         } else {
-          console.log("ER");
           setAlertSign(true);
+          setAlertMessage(data);
           setTimeout(() => {
             setAlertSign(false);
-          }, 5000);
+            setAlertMessage("");
+            setPhonetool([]);
+          }, 4500);
         }
         setAliasNew("");
       }
@@ -395,7 +401,7 @@ function Home() {
 
                     {alertSign && (
                       <div style={alertStyle}>
-                        <ErrorBar header="Invalid sign up" content="Check your alias or photo upload."/>
+                        <ErrorBar header="Invalid sign up" content={`${alertMessage}`} />
                       </div> 
                     )}
 
