@@ -1,18 +1,18 @@
 import * as React from "react";
 import Flashbar from "@cloudscape-design/components/flashbar";
 
-const ErrorBar = () => {
+const ErrorBar = ({header, content}) => {
   const [items, setItems] = React.useState([
     {
-      header: "Alias not in system",
+      header: header,
       type: "error",
-      content: "Retry login or sign up below.",
+      content: content,
       dismissible: true,
       dismissLabel: "Dismiss message",
       onDismiss: () => setItems([]),
       id: "message_1"
     }
-  ]);
+  ], [header, content]);
   return <Flashbar items={items} />;
 }
 

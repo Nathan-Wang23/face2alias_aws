@@ -38,6 +38,16 @@ const headerStyle = {
   textAlign: 'center'
 }
 
+const signUpButton = {
+  width:'100%',
+  textAlign:'center',
+  paddingLeft: '0%',
+  paddingTop:'5%',
+  paddingBottom: '0%',
+  fontSize: '12px',
+  
+}
+
 const modalStyle = {
   overlay: {
     backgroundColor:'rgba(25,37,52,0.75)',
@@ -48,7 +58,23 @@ const modalStyle = {
     height:'40%',
     position: 'absolute',
     left: '35%',
-    top: '30%'
+    top: '30%',
+    overflow: 'visible'
+  }
+}
+
+const signStyle = {
+  overlay: {
+    backgroundColor:'rgba(25,37,52,0.75)',
+  },
+  content: {
+    borderRadius:'20px',
+    width:'30%',
+    height:'65%',
+    position: 'relative',
+    left: '35%',
+    top: '30%',
+    overflow: 'hidden'
   }
 }
 
@@ -56,7 +82,7 @@ const submitButton = {
   width:'100%',
   textAlign:'center',
   paddingLeft: '0%',
-  paddingTop:'15%',
+  paddingTop:'10%',
   paddingBottom: '0%'
 
 }
@@ -81,6 +107,7 @@ const inputBoxStyle = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  flexDirection: 'column',
 }
 
 // const customStyles = {
@@ -97,8 +124,11 @@ const inputBoxStyle = {
 
 
 function Home() {
+  // Photo upload 
   const [value, setValue] = React.useState([]);
+  // Disable image submit button
   const [isButtonDisabled, setIsButtonDisabled] = React.useState(false);
+  // Image and boxes arrays
   const [previousUploads, setPreviousUploads] =React.useState([]);
   const [boxesOfBoxes, setBB] = React.useState([]);
   const [widths, setWidths] = React.useState([]);
@@ -106,11 +136,23 @@ function Home() {
   const [colorsAll, setColorsAll] = React.useState([]);
   const [aliasesAll, setAliasesAll] = React.useState([]);
   const [latest, setLatest] = React.useState(-1);
+
+  //Login Modal
   const [isModalOpen, setIsModalOpen] = React.useState(true);
   const [aliasValue, setAliasValue] = React.useState("");
   const [alert, setAlert] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-  const [user, setUser] = React.useState('');
+
+  // Logged in user
+  const [user, setUser] = React.useState("");
+
+  //Sign Up Modal
+  const [isSign, setIsSign] = React.useState(false);
+  const [aliasNew, setAliasNew] = React.useState("");
+  const [phonetool, setPhonetool] = React.useState([]);
+  const [alertSign, setAlertSign] = React.useState(false);
+  const [successSign, setSuccessSign] = React.useState(false);
+
 
 
 
@@ -255,20 +297,32 @@ function Home() {
     );
   }
 
+  function toggleSignUp() {
+    setAliasNew("");
+    setPhonetool([]);
+    setAliasValue("");
+    setIsSign(!isSign);
+  }
+
+  function handleSignUp() {
+
+  }
+
   const SubmitButton = () => (
     <Button className="submitButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
   );
 
     return (
             <div>
-              <div>
+              {!isSign && (
+                <div>
                 <Modal 
                   style={modalStyle}
                   isOpen={isModalOpen}>
 
                     {alert && (
                       <div style={alertStyle}>
-                        <ErrorBar/>
+                        <ErrorBar header="Alias not in system" content="Retry login or sign up below."/>
                       </div> 
                     )}
 
@@ -286,7 +340,7 @@ function Home() {
                           name="message" ///...............................
                           placeholder='Alias'
                           value={aliasValue}
-                          autoComplete="off" //to not show the prev ones
+                          autoComplete="off" //to not show the previous inputs
                           onChange={event =>
                           setAliasValue(event.detail.value)}
                           
@@ -295,9 +349,85 @@ function Home() {
                       <div style={submitButton}>
                         <Button style={submitButton} type="submit" onClick={submitLogin}>Log In</Button>
                       </div>
+                      <div style={signUpButton}>
+                        <p>Don't have an account?</p>
+                        <Button style={signUpButton} onClick={toggleSignUp}>Sign Up</Button>
+                      </div>
                     </FormField>
                   </Modal>
-              </div>
+                </div>
+              )}
+
+              {/* Sign Up */}
+              {isSign && (
+                <div>
+                  <Modal 
+                  style={signStyle}
+                  isOpen={isSign}>
+
+                    {alert && (
+                      <div style={alertStyle}>
+                        <ErrorBar header="Invalid sign up" content="Check your alias or photo upload."/>
+                      </div> 
+                    )}
+
+                    {success && (
+                      <div style={alertStyle}>
+                        <SuccessBar/>
+                    </div>
+                    )}
+
+                    <h3 style={headerStyle}>Sign Up for Face2Alias</h3>
+                    <FormField>
+                      <div style={inputBoxStyle}>
+                        <Input
+                          id="message"
+                          name="message" ///...............................
+                          placeholder='Alias'
+                          value={aliasNew}
+                          autoComplete="off" //to not show the previous inputs
+                          onChange={event =>
+                            setAliasNew(event.detail.value)}
+                        />
+                        <br/>
+                        <FileUpload
+                          onChange={({ detail }) => setPhonetool(detail.value)}
+                          value={phonetool}
+                          i18nStrings={{
+                            uploadButtonText: e =>
+                              e ? "Choose files" : "Choose file",
+                            dropzoneText: e =>
+                              e
+                                ? "Drop files to upload"
+                                : "Drop file to upload",
+                            removeFileAriaLabel: e =>
+                              `Remove file ${e + 1}`,
+                            limitShowFewer: "Show fewer files",
+                            limitShowMore: "Show more files",
+                            errorIconAriaLabel: "Error"
+                          }}
+                          showFileLastModified
+                          showFileSize
+                          showFileThumbnail
+                          tokenLimit={3}
+                          constraintText="Upload jpeg phonetool"
+                        />
+
+                      </div>
+                      <div style={submitButton}>
+                        <Button style={submitButton} onClick={handleSignUp}>Sign Up</Button>
+                      </div>
+                      <div style={signUpButton}>
+                        <p>Already have an account?</p>
+                        <Button style={signUpButton} type="submit" onClick={toggleSignUp}>Log In</Button>
+                      </div>
+                      
+                    </FormField>
+                  </Modal>
+                </div>
+              )}
+
+              
               <div style={navBar}>
               {/* TopNavigation */}
               <TopNavigation

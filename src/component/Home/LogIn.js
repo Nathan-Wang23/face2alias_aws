@@ -23,22 +23,29 @@ const containerStyle = {
     flexDirection: 'column',
   };
 
-  function Login() {
-    return(
-            <form>
-                <label>
-                <p>Alias</p>
-                <input type="text" />
-                </label>
-                <label>
-                <p>Password</p>
-                <input type="password" />
-                </label>
-                <div>
-                <button type="submit">Submit</button>
-                </div>
-            </form>
-    )
+  const Login = () => {
+    return (
+      <div>
+        <h3 style={headerStyle}>Login to Face2Alias</h3>
+        <FormField>
+          <div style={inputBoxStyle}>
+            <Input
+              id="message"
+              name="message" ///...............................
+              placeholder='Alias'
+              value={aliasValue}
+              autoComplete="off" //to not show the prev ones
+              onChange={event =>
+              setAliasValue(event.detail.value)}
+              
+            />
+          </div>
+          <div style={submitButton}>
+            <Button style={submitButton} type="submit" onClick={submitLogin}>Log In</Button>
+          </div>
+        </FormField>
+      </div>
+    );
   }
 
 
