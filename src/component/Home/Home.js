@@ -1,5 +1,4 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import FormField from '@cloudscape-design/components/form-field';
 import FileUpload from '@cloudscape-design/components/file-upload';
 import TopNavigation from "@cloudscape-design/components/top-navigation";
@@ -9,6 +8,14 @@ import './styles.css';
 import ImageBox from "./ImageBox"
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
+import Modal from "react-modal";
+// @cloudscape-design/components/modal
+import Input from "@cloudscape-design/components/input";
+import "@fontsource/open-sans"; // Defaults to weight 400
+import "@fontsource/open-sans/400.css"; // Specify weight
+import ErrorBar from './errorBar';
+import SuccessBar from './successBar';
+
 
 <link rel="stylesheet" href="styles.css"></link>
 const containerStyle = {
@@ -16,6 +23,49 @@ const containerStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   height: '100vh',
+}
+
+const alertStyle = {
+  zIndex: '999999'
+}
+
+const headerStyle = {
+  fontFamily:'Open Sans',
+  fontSize:'18px',
+  fontWeight: '700',
+  paddingLeft:'35%',
+  padding: '30px 0',
+  textAlign: 'center'
+}
+
+const inputStyle = {
+  display:'flex',
+  flex:'row',
+  left:'50%',
+  fontFamily:'Open Sans',
+  fontSize:'18px',
+  fontWeight: '700',
+  textAlign: 'center',
+  padding: '20px 0'
+}
+
+const modalStyle = {
+  content: {
+    borderRadius:'20px',
+    width:'30%',
+    height:'40%',
+    position: 'absolute',
+    left: '35%',
+    top: '30%'
+  }
+}
+
+const submitButton = {
+  width:'100%',
+  textAlign:'center',
+  paddingLeft: '0%',
+  paddingTop:'5%',
+  paddingBottom: '0%'
 }
 
 const navBar = {
@@ -35,7 +85,20 @@ const uploadBoxStyle = {
   textAlign: 'center'
 };
 
-function Home() { 
+// const customStyles = {
+//   content: {
+//     top: '50%',
+//     left: '50%',
+//     right: 'auto',
+//     bottom: 'auto',
+//     marginRight: '-50%',
+//     transform: 'translate(-50%, -50%)',
+//   },
+// };
+
+
+
+function Home() {
   const [value, setValue] = React.useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = React.useState(false);
   const [previousUploads, setPreviousUploads] =React.useState([]);
@@ -45,9 +108,43 @@ function Home() {
   const [colorsAll, setColorsAll] = React.useState([]);
   const [aliasesAll, setAliasesAll] = React.useState([]);
   const [latest, setLatest] = React.useState(-1);
+  const [isModalOpen, setIsModalOpen] = React.useState(true);
+  const [aliasValue, setAliasValue] = React.useState("");
+  const [alert, setAlert] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+
+
+  async function submitLogin() {
+    try {
+      let alias = aliasValue.toString();
+      let url = "https://jbk08mzwr9.execute-api.us-west-2.amazonaws.com/v1/"
+      let res = await fetch(url, {
+        method: 'POST',
+        body: alias
+      });
+      if (res.status === 200) {
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          setIsModalOpen(false);
+        }, 3000);
+        
+      } else {
+        console.log(res);
+        setAlert(true);
+        setTimeout(() => {
+          setAlert(false);
+        }, 5000);
+      }
+      setAliasValue("");
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
 
   function face2aliasSubmit() {
-    if (value == null || value.length == 0) {
+    if (value === null || value.length === 0) {
       console.log("Error: no file specified")
     }
     else {
@@ -66,21 +163,19 @@ function Home() {
             method: 'POST',
             body: body
           });
-          const data = await res.json();          
+          const data = await res.json();
           bound_boxes(image_base64, data);
           setIsButtonDisabled(false);
           setValue([]);
         } catch (error) {
           console.log("error");
         }
-        
+
       }
 
     }
-    
+
   }
-
-
 
   function bound_boxes(image, data) {
     let getDimensions = new Promise(function(resolve, reject) {
@@ -88,8 +183,8 @@ function Home() {
       img.onload = () => {
         let w = img.width;
         let h = img.height;
-        
-        if (w == undefined || h == undefined) {
+
+        if (w === undefined || h === undefined) {
           reject("ERROR");  // when error
         } else {
           resolve([w, h]); // when successful
@@ -97,9 +192,9 @@ function Home() {
       }
       img.src = image;
     });
-    
+
     getDimensions.then(
-      function(da) { 
+      function(da) {
         let wid = da[0];
         let hei = da[1];
 
@@ -107,21 +202,20 @@ function Home() {
         hei *= ratio;
         wid *= ratio;
 
-
-        let boxes = new Array();        
+        let boxes = [];
         let aliases_list = data['aliases'];
         let boxes_list = data['boxes'];
-        
-        if (aliases_list == undefined) {
+
+        if (aliases_list === undefined) {
           return;
         }
 
         let num_detected = aliases_list.length;
-        let cols = new Array();
+        let cols = [];
         console.log(aliases_list)
 
         for (let i = 0; i < num_detected; i++) {
-          if (aliases_list[i] == "") {
+          if (aliases_list[i] === "") {
             cols.push("#FF0000");
             aliases_list[i] = "na";
           } else {
@@ -129,7 +223,7 @@ function Home() {
             let temp = aliases_list[i];
             aliases_list[i] = " " + temp + " ";
           }
-          // how to get the name 
+          // how to get the name
           boxes.push({x: boxes_list[i]['Left'] * wid, y: boxes_list[i]['Top'] * hei, width: boxes_list[i]['Width'] * wid, height: boxes_list[i]['Height'] * hei})
         }
         let temp1 = boxesOfBoxes;
@@ -159,13 +253,47 @@ function Home() {
       }
     );
   }
-  
+
   const SubmitButton = () => (
     <Button className="submitButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
   );
-  
-    return ( 
-            <div> 
+
+    return (
+            <div>
+              <div>
+                <Modal 
+                  style={modalStyle}
+                  isOpen={isModalOpen}>
+
+                    {alert && (
+                      <div style={alertStyle}>
+                        <ErrorBar/>
+                      </div> 
+                    )}
+
+                    {success && (
+                      <div style={alertStyle}>
+                        <SuccessBar/>
+                    </div>
+                    )}
+
+                    <h3 style={headerStyle}>Login to Face2Alias</h3>
+                    <FormField>
+                      <div style={inputStyle}>
+                        <Input
+                          placeholder='Alias'
+                          value={aliasValue}
+                          autoComplete="off" //to not show the prev ones
+                          onChange={event =>
+                          setAliasValue(event.detail.value)}
+                        />
+                      </div>
+                      <div style={submitButton}>
+                        <Button style={submitButton} type="submit" onClick={submitLogin}>Submit</Button>
+                      </div>
+                    </FormField>
+                  </Modal>
+              </div>
               <div style={navBar}>
               {/* TopNavigation */}
               <TopNavigation
@@ -264,15 +392,15 @@ function Home() {
                       showFileThumbnail
                       tokenLimit={1}
                     />
-                  </FormField> 
+                  </FormField>
                   <SubmitButton />
-                  
+
                 </div>
                 </div>
               </div>
             </div>
-     
+
     );
 }
 
-export default Home; 
+export default Home;
