@@ -27,7 +27,7 @@ const ImageBox = ({ image_base64, boxesCoordinates, width, height, color, aliase
         ctx.strokeRect(boxesCoordinates[i].x, boxesCoordinates[i].y, boxesCoordinates[i].width, boxesCoordinates[i].height); // draw the box
       
 
-        if (aliases[i] != "na") {
+        if (aliases[i] !== "na") {
           ctx.fillStyle = "#ffffff";
           const textWidth = ctx.measureText(aliases[i]).width;
           ctx.fillRect(boxesCoordinates[i].x + boxesCoordinates[i].width / 2 - textWidth / 2 - 2, boxesCoordinates[i].y - 20, textWidth + 4, 20);
@@ -38,7 +38,7 @@ const ImageBox = ({ image_base64, boxesCoordinates, width, height, color, aliase
       }
       }
     };
-  }, [image_base64, boxesCoordinates]);
+  }, [image_base64, boxesCoordinates, width, height, color, aliases]);
 
   return <canvas ref={canvasRef} width={width} height={height} />;
 };
