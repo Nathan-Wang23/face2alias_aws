@@ -21,3 +21,9 @@ body {
   align-items: 'center';
 }
 
+.textField{
+  width:'100%';
+  text-Align:'center';
+  padding-Top:'5%';
+}
+
