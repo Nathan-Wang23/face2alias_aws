@@ -23,10 +23,25 @@ const containerStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   height: '100vh',
+  backgroundColor: 'rgba(25,37,52,0.75)'
+}
+
+const carousel = {
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '650px',
+  padding: '20px',
+  backgroundColor: 'rgba(25,37,52,0.75)',
+  border: 'solid 2px',
+  borderColor: 'rgba(25,37,52,1)',
 }
 
 const alertStyle = {
   zIndex: '999999'
+}
+
+const imageButton = {
+  marginTop: "5%"
 }
 
 const headerStyle = {
@@ -83,12 +98,12 @@ const submitButton = {
   textAlign:'center',
   paddingLeft: '0%',
   paddingTop:'10%',
-  paddingBottom: '0%'
-
+  paddingBottom: '0%',
 }
 
 const navBar = {
-  position: 'sticky'
+  position: 'sticky',
+  zIndex: '999999'
 }
 
 const uploadBoxStyle = {
@@ -101,7 +116,9 @@ const uploadBoxStyle = {
   flexDirection: 'column',
   margin: 'auto',
   padding: 'auto',
-  textAlign: 'center'
+  textAlign: 'center',
+  backgroundColor: 'white',
+  marginTop: '20px' 
 }
 const inputBoxStyle = {
   display: 'flex',
@@ -125,7 +142,7 @@ function Home() {
   const [latest, setLatest] = React.useState(-1);
 
   //Login Modal
-  const [isModalOpen, setIsModalOpen] = React.useState(true);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [aliasValue, setAliasValue] = React.useState("");
   const [alert, setAlert] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
@@ -140,6 +157,25 @@ function Home() {
   const [alertSign, setAlertSign] = React.useState(false);
   const [successSign, setSuccessSign] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState("");
+
+  React.useLayoutEffect(() => {
+    let data = JSON.parse(sessionStorage.getItem("reactStates"));
+    if (data !== null) {
+      setIsButtonDisabled(data['isButtonDisabled']);
+      setPreviousUploads(data['previousUploads']);
+      setBB(data['boxesOfBoxes']);
+      setWidths(data['widths']);
+      setHeights(data['heights']);
+      setColorsAll(data['colorsAll']);
+      setAliasesAll(data['aliasesAll']);
+      setLatest(data['latest']);
+      setIsModalOpen(false);
+      setUser(data['user']);
+      setIsSign(false);
+    } else {
+      setIsModalOpen(true);
+    }
+  }, []);
 
 
 
@@ -278,6 +314,19 @@ function Home() {
         let last = latest;
         last += 1;
         setLatest(last);
+
+        let reactStates = {
+          "isButtonDisabled": isButtonDisabled,
+          "previousUploads": previousUploads,
+          "boxesOfBoxes": boxesOfBoxes,
+          "widths": widths,
+          "heights": heights,
+          "colorsAll": colorsAll,
+          "aliasesAll": aliasesAll,
+          "latest": latest + 1,
+          "user": user
+        }
+        sessionStorage.setItem("reactStates", JSON.stringify(reactStates));
       },
       function(error) {
         console.log(error);
@@ -340,8 +389,27 @@ function Home() {
     }
   }
 
+  function logout_function(e) {
+    sessionStorage.clear();
+    console.log(e);
+    setIsButtonDisabled(false);
+    setPreviousUploads([]);
+    setBB([]);
+    setWidths([]);
+    setHeights([]);
+    setColorsAll([]);
+    setAliasesAll([]);
+    setLatest(-1);
+    setIsModalOpen(true);
+    setUser("");
+    setIsSign(false);
+    window.location.reload();
+  }
+
   const SubmitButton = () => (
-    <Button className="submitButton" onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
+    <div style={imageButton} >
+          <Button onClick={face2aliasSubmit} variant="primary" disabled={isButtonDisabled} >Submit</Button>
+    </div>
   );
 
     return (
@@ -361,7 +429,7 @@ function Home() {
 
                     {success && (
                       <div style={alertStyle}>
-                        <SuccessBar header="Successfully logged in" content="Successfully logged in"/>
+                        <SuccessBar header="Successfully logged in" content={`Welcome ${user}!`}/>
                     </div>
                     )}
 
@@ -425,6 +493,7 @@ function Home() {
                         />
                         <br/>
                         <FileUpload
+                          style= {imageButton}
                           onChange={({ detail }) => setPhonetool(detail.value)}
                           value={phonetool}
                           i18nStrings={{
@@ -472,24 +541,13 @@ function Home() {
               utilities={[
                 {
                   type: "menu-dropdown",
-                  iconName: "settings",
-                  ariaLabel: "Settings",
-                  title: "Settings",
-                  items: [
-                    {
-                      id: "settings-org",
-                      text: "Organizational settings"
-                    },
-                    {
-                      id: "settings-project",
-                      text: "Project settings"
-                    }
-                  ]
-                },
-                {
-                  type: "menu-dropdown",
                   text: user, 
-                  description: "email@example.com",
+                  description: user + "@amazon.com",
+                  onItemClick: (event) => {
+                    if (event.detail.id === "signout") {
+                      logout_function();
+                    }
+                  },
                   iconName: "user-profile",
                   items: [
                     { id: "profile", text: "Profile" },
@@ -516,7 +574,7 @@ function Home() {
                         }
                       ]
                     },
-                    { id: "signout", text: "Sign out" }
+                    { id: "signout", text: "Sign out"}
                   ]
                 }
               ]}
@@ -527,13 +585,14 @@ function Home() {
               <div  style={containerStyle}>
                 <div className="center" >
                 {previousUploads.length > 0 && (
-                      <Carousel className='crls' showThumbs={false} emulateTouch selectedItem={latest} autoFocus>
+                  <div style={carousel}>
+                      <Carousel showThumbs={false} emulateTouch selectedItem={latest} autoFocus>
                         {previousUploads.map((upload, index) => (
-                          <div key={index}>
                             <ImageBox image_base64={upload} boxesCoordinates={boxesOfBoxes[index]} width={widths[index]} height={heights[index]} color={colorsAll[index]} aliases={aliasesAll[index]}/>
-                          </div>
                         ))}
-                    </Carousel>)}
+                    </Carousel>
+                  </div>
+                )}
 
                 <div className="div2" style={uploadBoxStyle}>
                   <FormField
@@ -572,3 +631,6 @@ function Home() {
 }
 
 export default Home;
+
+
+// loading, plus two notifications, sign out

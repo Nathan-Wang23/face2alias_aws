@@ -6,15 +6,19 @@ body {
   }
 
 
-  .crls {
-    width: 'auto';
-    height: 'auto';
-    margin-top: '5%'
-  }
-  .submitButton {
-    margin-top: '2%';
-    margin-bottom:'3%'
-  }
+.crls {
+  width: '40px';
+  height: 'auto';
+  margin-top: '5%';
+  color: "blue"
+}
+
+.submitButton {
+  margin-top: '2%';
+  margin-bottom:'3%';
+  padding: "100px";
+}
+
 .log_center{
   min-height: '100vh';
   display: 'flex';
